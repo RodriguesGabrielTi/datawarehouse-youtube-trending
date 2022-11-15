@@ -27,7 +27,7 @@ description
 class VideoExtractor:
     @classmethod
     def extract(cls, csv, country):
-        csv_file = pd.read_csv(config.files_dir + "/" + csv)
+        csv_file = pd.read_csv(config.files_dir + "/" + csv, encoding="utf-8")
         video_builder = VideoBuilder()
         for i, row in csv_file.iterrows():
             tags = row.get("tags").replace("\"", "").split("|")
