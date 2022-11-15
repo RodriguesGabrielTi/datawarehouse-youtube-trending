@@ -125,14 +125,15 @@ class VideoBuilder:
         return self
 
     def add_tags(self, tags: list):
-        already_created = [tag.name for tag in session.query(Tag).all()]
-        for tag in list(set(tags) - set(already_created)):
-            tag_obj = Tag(name=tag)
-            session.add(tag_obj)
-            self.__tags.add(tag_obj)
-        for tag in already_created:
-            self.__tags.add(session.query(Tag).filter(Tag.name == tag).first())
-        session.commit()
+        # already_created = [tag.name for tag in session.query(Tag).all()]
+        # for tag in list(set(tags) - set(already_created)):
+        #     tag_obj = Tag(name=tag)
+        #     session.add(tag_obj)
+        #     self.__tags.add(tag_obj)
+        # for tag in already_created:
+        #     self.__tags.add(session.query(Tag).filter(Tag.name == tag).first())
+        # session.commit()
+        return self
 
     def _get_video(self):
         """
