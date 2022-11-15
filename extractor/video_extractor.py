@@ -27,7 +27,11 @@ description
 class VideoExtractor:
     @classmethod
     def extract(cls, csv, country):
-        csv_file = pd.read_csv(config.files_dir + "/" + csv, encoding="utf-8")
+        encoding = "utf-8"
+        if country in ["RU", "JP", "KR", "MX"]:
+            encoding = "ISO-8859-1"
+        print("Extracting", csv)
+        csv_file = pd.read_csv(config.files_dir + "/" + csv, encoding=encoding)
         video_builder = VideoBuilder()
         for i, row in csv_file.iterrows():
             tags = row.get("tags").replace("\"", "").split("|")
