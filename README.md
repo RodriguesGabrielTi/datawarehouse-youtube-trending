@@ -25,5 +25,13 @@ alembic downgrade -1
 - Step 1: Update and Refresh Repository Lists
     - sudo apt update
     - sudo apt-get install python3-dev
+    - sudo apt install libpq-dev
+    - sudo apt install python3-testresources
 - Executar o comando pip install -r requirements.txt
 
+---
+
+Run Postgres DB from docker-compose
+```bash
+docker-compose up -d
+```
