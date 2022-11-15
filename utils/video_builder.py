@@ -1,6 +1,7 @@
 import datetime
 from database.connection import session
-from domain.models import FactVideo, DimensionTime, Weekdays, Category, DimensionView, DimensionInteraction
+from domain.models import FactVideo, DimensionTime, Weekdays, Category, DimensionView, DimensionInteraction, Tag, \
+    VideoTag
 
 
 class VideoBuilder:
@@ -10,12 +11,15 @@ class VideoBuilder:
 
     def __init__(self):
         self.__video = None
+        self.__tags = set()
 
     def submit(self):
         assert session.query(FactVideo).filter(FactVideo.video_id == self._get_video().video_id,
                                                FactVideo.trending_location == self._get_video().trending_location) \
                is not None, "Vídeo já cadastrado."
         session.add(self._get_video())
+        for tag in self.__tags:
+            session.add(VideoTag(tag_id=tag.id, video_id=self._get_video().id))
         session.commit()
         video = self._get_video()
         self._clear()
@@ -120,6 +124,16 @@ class VideoBuilder:
         self._get_video().category_id = category.id
         return self
 
+    def add_tags(self, tags: list):
+        already_created = [tag.name for tag in session.query(Tag).all()]
+        for tag in list(set(tags) - set(already_created)):
+            tag_obj = Tag(name=tag)
+            session.add(tag_obj)
+            self.__tags.add(tag_obj)
+        for tag in already_created:
+            self.__tags.add(session.query(Tag).filter(Tag.name == tag).first())
+        session.commit()
+
     def _get_video(self):
         """
         :return: FactVideo
@@ -152,3 +166,4 @@ class VideoBuilder:
 
     def _clear(self):
         self.__video = None
+        self.__tags = set()

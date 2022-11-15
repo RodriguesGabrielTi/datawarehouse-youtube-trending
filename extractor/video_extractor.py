@@ -30,6 +30,7 @@ class VideoExtractor:
         csv_file = pd.read_csv(config.files_dir + "/" + csv)
         video_builder = VideoBuilder()
         for i, row in csv_file.iterrows():
+            tags = row.get("tags").replace("\"", "").split("|")
             interactions = (row.get("likes") + row.get("dislikes") + 2 * row.get("comment_count")) / row.get("views")
             video_builder\
                 .set_video_id(row.get("video_id"))\
@@ -46,7 +47,8 @@ class VideoExtractor:
                 .set_video_error_or_removed(bool(row.get("video_error_or_removed")))\
                 .set_description(row.get("description"))\
                 .set_category(int(row.get("category_id")))\
-                .set_trending_location(country)
+                .set_trending_location(country)\
+                .add_tags(tags)
             try:
                 video_builder.submit()
             except AssertionError as e:

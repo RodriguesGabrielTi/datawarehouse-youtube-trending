@@ -3,7 +3,7 @@ from datetime import datetime
 
 from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import validates, relationship
+from sqlalchemy.orm import validates
 
 Base = declarative_base()
 
@@ -46,8 +46,8 @@ class DimensionTime(Base, Timestamp):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     day = Column(String())
-    month = Column(String(), primary_key=True)
-    year = Column(String(), primary_key=True)
+    month = Column(String())
+    year = Column(String())
     weekday = Column(String())
 
     @validates('weekday')
@@ -78,11 +78,18 @@ class Category(Base, Timestamp):
     name = Column(String)
 
 
+class Tag(Base, Timestamp):
+    __tablename__ = 'tag'
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    name = Column(String, unique=True)
+
+
 class FactVideo(Base, Timestamp):
     __tablename__ = 'fact_video'
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    video_id = Column(String(250), primary_key=True)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()), unique=True)
+    video_id = Column(String(250), nullable=False)
     trending_date = Column(String(36), ForeignKey('dimension_time.id'), nullable=False)
     title = Column(String)
     channel_title = Column(String)
@@ -98,3 +105,9 @@ class FactVideo(Base, Timestamp):
     comment_count = Column(Integer)
     category_id = Column(String(36), ForeignKey('category.id'), nullable=False)
 
+
+class VideoTag(Base, Timestamp):
+    __tablename__ = 'video_tag'
+
+    tag_id = Column(String(36), ForeignKey('tag.id'), nullable=False, primary_key=True)
+    video_id = Column(String(36), ForeignKey('fact_video.id'), nullable=False, primary_key=True)
