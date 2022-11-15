@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from logging.config import fileConfig
 
 from alembic import context
@@ -24,6 +25,7 @@ target_metadata = models.Base.metadata
 
 
 def get_url():
+    load_dotenv()
     url = os.getenv('DATABASE_URL', None)
     if not url:
         raise Exception('DATABASE_URL not defined')
