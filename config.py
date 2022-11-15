@@ -7,8 +7,10 @@ from dotenv import load_dotenv
 basedir = path.abspath(path.dirname(__file__))
 load_dotenv(path.join(basedir, ".env"))
 
+files_dir = basedir + "/files"
+
 # Database connection variables
-DATABASE_URL = environ.get("SQLALCHEMY_DATABASE_URI")
+DATABASE_URL = environ.get("DATABASE_URL")
 
 # Reset data after each run
 CLEANUP_DATA = False

@@ -1,0 +1,17 @@
+services:
+  postgres:
+    container_name: postgres_container
+    image: postgres:bullseye
+    environment:
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      PGDATA: /data/postgres
+    volumes:
+       - postgres:/data/postgres
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+
+volumes:
+    postgres:

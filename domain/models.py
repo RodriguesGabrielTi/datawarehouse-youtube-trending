@@ -36,6 +36,10 @@ class Weekdays:
     def is_valid(cls, weekday):
         return weekday in cls._all
 
+    @classmethod
+    def get_weekday(cls, i: int):
+        return cls._all[i]
+
 
 class DimensionTime(Base, Timestamp):
     __tablename__ = 'dimension_time'
@@ -66,6 +70,14 @@ class DimensionInteraction(Base, Timestamp):
     description = Column(String())
 
 
+class Category(Base, Timestamp):
+    __tablename__ = 'category'
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    category_id = Column(Integer, unique=True)
+    name = Column(String)
+
+
 class FactVideo(Base, Timestamp):
     __tablename__ = 'fact_video'
 
@@ -79,9 +91,10 @@ class FactVideo(Base, Timestamp):
     interation_group = Column(String(36), ForeignKey('dimension_interaction.id'), nullable=False)
     ratings_disabled = Column(Boolean)
     video_error_or_removed = Column(Boolean)
-    post_location = Column(String)
     trending_location = Column(String)
     description = Column(String)
     likes = Column(Integer)
     dislikes = Column(Integer)
     comment_count = Column(Integer)
+    category_id = Column(String(36), ForeignKey('category.id'), nullable=False)
+
