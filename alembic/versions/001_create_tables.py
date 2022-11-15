@@ -1,8 +1,8 @@
-"""recreate_db
+"""create_tables
 
 Revision ID: 001
 Revises: 
-Create Date: 2022-11-15 10:10:27.831421
+Create Date: 2022-11-15 13:48:21.691487
 
 """
 from alembic import op
