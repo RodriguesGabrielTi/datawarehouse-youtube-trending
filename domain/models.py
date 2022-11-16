@@ -1,9 +1,9 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, Boolean
+from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, Boolean, Float
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship, backref
 
 Base = declarative_base()
 
@@ -61,6 +61,8 @@ class DimensionView(Base, Timestamp):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     description = Column(String())
+    max_value = Column(Integer())
+    min_value = Column(Integer())
 
 
 class DimensionInteraction(Base, Timestamp):
@@ -68,6 +70,8 @@ class DimensionInteraction(Base, Timestamp):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     description = Column(String())
+    max_value = Column(Float())
+    min_value = Column(Float())
 
 
 class Category(Base, Timestamp):
@@ -94,8 +98,8 @@ class FactVideo(Base, Timestamp):
     title = Column(String)
     channel_title = Column(String)
     publish_time = Column(String(36), ForeignKey('dimension_time.id'), nullable=False)
-    view_group = Column(String(36), ForeignKey('dimension_view.id'), nullable=False)
-    interation_group = Column(String(36), ForeignKey('dimension_interaction.id'), nullable=False)
+    view_group_id = Column(String(36), ForeignKey('dimension_view.id', ondelete='SET NULL'))
+    interation_group_id = Column(String(36), ForeignKey('dimension_interaction.id', ondelete='SET NULL'))
     ratings_disabled = Column(Boolean)
     video_error_or_removed = Column(Boolean)
     trending_location = Column(String)
@@ -103,8 +107,12 @@ class FactVideo(Base, Timestamp):
     likes = Column(Integer)
     dislikes = Column(Integer)
     comment_count = Column(Integer)
+    views = Column(Integer)
+    interactions_points = Column(Float)
     category_id = Column(String(36), ForeignKey('category.id'), nullable=False)
 
+    interation_group = relationship("DimensionInteraction", backref=backref('dimension_interaction', passive_deletes=True))
+    view_group = relationship("DimensionView", backref=backref('dimension_view', passive_deletes=True))
 
 class VideoTag(Base, Timestamp):
     __tablename__ = 'video_tag'

@@ -1,6 +1,7 @@
 import os
 import config
 from extractor.category_extractor import CategoryExtractor
+from extractor.compute_dimensions import DimensionCalc
 from extractor.video_extractor import VideoExtractor
 import time
 
@@ -29,11 +30,15 @@ def extract_videos():
     print("Process time to read all the CSVs:", str(round(end_videos - start_videos, 3)))
 
 
-if __name__ == "__main__":
+def compute_dimensions():
+    calc = DimensionCalc()
+    calc.compute_videos_views()
+    calc.compute_videos_interactions()
+    calc.update_all_videos()
 
+if __name__ == "__main__":
     # Add categories
     execute_categories()
     # Add videos
     extract_videos()
-
-
+    compute_dimensions()

@@ -1,8 +1,8 @@
-"""create_tables
+"""init
 
 Revision ID: 001
 Revises: 
-Create Date: 2022-11-15 13:48:21.691487
+Create Date: 2022-11-15 20:19:21.018830
 
 """
 from alembic import op
@@ -32,6 +32,8 @@ def upgrade():
     sa.Column('updated', sa.DateTime(), nullable=True),
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('description', sa.String(), nullable=True),
+    sa.Column('max_value', sa.Float(), nullable=True),
+    sa.Column('min_value', sa.Float(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('dimension_time',
@@ -49,6 +51,8 @@ def upgrade():
     sa.Column('updated', sa.DateTime(), nullable=True),
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('description', sa.String(), nullable=True),
+    sa.Column('max_value', sa.Integer(), nullable=True),
+    sa.Column('min_value', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('tag',
@@ -68,8 +72,8 @@ def upgrade():
     sa.Column('title', sa.String(), nullable=True),
     sa.Column('channel_title', sa.String(), nullable=True),
     sa.Column('publish_time', sa.String(length=36), nullable=False),
-    sa.Column('view_group', sa.String(length=36), nullable=False),
-    sa.Column('interation_group', sa.String(length=36), nullable=False),
+    sa.Column('view_group_id', sa.String(length=36), nullable=True),
+    sa.Column('interation_group_id', sa.String(length=36), nullable=True),
     sa.Column('ratings_disabled', sa.Boolean(), nullable=True),
     sa.Column('video_error_or_removed', sa.Boolean(), nullable=True),
     sa.Column('trending_location', sa.String(), nullable=True),
@@ -77,12 +81,14 @@ def upgrade():
     sa.Column('likes', sa.Integer(), nullable=True),
     sa.Column('dislikes', sa.Integer(), nullable=True),
     sa.Column('comment_count', sa.Integer(), nullable=True),
+    sa.Column('views', sa.Integer(), nullable=True),
+    sa.Column('interactions_points', sa.Float(), nullable=True),
     sa.Column('category_id', sa.String(length=36), nullable=False),
     sa.ForeignKeyConstraint(['category_id'], ['category.id'], ),
-    sa.ForeignKeyConstraint(['interation_group'], ['dimension_interaction.id'], ),
+    sa.ForeignKeyConstraint(['interation_group_id'], ['dimension_interaction.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['publish_time'], ['dimension_time.id'], ),
     sa.ForeignKeyConstraint(['trending_date'], ['dimension_time.id'], ),
-    sa.ForeignKeyConstraint(['view_group'], ['dimension_view.id'], ),
+    sa.ForeignKeyConstraint(['view_group_id'], ['dimension_view.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('id')
     )
