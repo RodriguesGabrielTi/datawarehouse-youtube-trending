@@ -1,4 +1,6 @@
 import datetime
+from operator import or_, and_
+
 from database.connection import session
 from domain.models import FactVideo, DimensionTime, Weekdays, Category, DimensionView, DimensionInteraction, Tag, \
     VideoTag
@@ -6,15 +8,22 @@ from domain.models import FactVideo, DimensionTime, Weekdays, Category, Dimensio
 
 class VideoBuilder:
     groups = ["altissimo", "alto", "medio", "baixo","muito baixo"]
-    interaction_constraint = [7, 5, 3, 1, -1]
-    view_constraint = [10_000_000, 1_000_000, 100_000, 10_000, -1]
 
     def __init__(self):
         self.__video = None
         self.__tags = set()
 
+    @staticmethod
+    def get_interactions_group(value):
+        return session.query(DimensionInteraction).filter(and_(DimensionInteraction.max_value >= value, DimensionInteraction.min_value <= value)).first()
+
+    @staticmethod
+    def get_views_group(value):
+        return session.query(DimensionView).filter(and_(DimensionView.max_value >= value, DimensionView.min_value <= value)).first()
+
     def submit(self):
         assert session.query(FactVideo).filter(FactVideo.video_id == self._get_video().video_id,
+                                               FactVideo.trending_date == self._get_video().trending_date,
                                                FactVideo.trending_location == self._get_video().trending_location) \
                is not None, "Vídeo já cadastrado."
         session.add(self._get_video())
@@ -30,18 +39,23 @@ class VideoBuilder:
         return self
 
     def set_trending_date(self, trending_date: str):
-        trending_date_list = trending_date.split(".")
-        self._get_video().trending_date = self._find_time_dimension(
-            {
-                "year": trending_date_list[0],
-                "month": trending_date_list[2],
-                "day": trending_date_list[1]
-            }
-        ).id
+        if trending_date:
+            trending_date_list = trending_date.split(".")
+            self._get_video().trending_date = self._find_time_dimension(
+                {
+                    "year": trending_date_list[0],
+                    "month": trending_date_list[2],
+                    "day": trending_date_list[1]
+                }
+            ).id
         return self
 
     def set_title(self, title: str):
         self._get_video().title = title
+        return self
+
+    def set_views(self, views: int):
+        self._get_video().views = views
         return self
 
     def set_channel_title(self, channel_title: str):
@@ -60,31 +74,15 @@ class VideoBuilder:
         return self
 
     def set_view_group(self, views: int):
-        for i, group in enumerate(VideoBuilder.groups):
-            if VideoBuilder.view_constraint[i] <= views:
-                views_dimension = session.query(DimensionView).filter(
-                    DimensionView.description == group
-                ).first()
-                if views_dimension is None:
-                    views_dimension = DimensionView(description=group)
-                    session.add(views_dimension)
-                    session.commit()
-                self._get_video().view_group = views_dimension.id
-                break
+        view_group = self.get_views_group(views)
+        if view_group:
+            self._get_video().view_group_id = view_group.id
         return self
 
     def set_interaction_group(self, interation: float):
-        for i, group in enumerate(VideoBuilder.groups):
-            if VideoBuilder.interaction_constraint[i] <= interation:
-                interaction_dimension = session.query(DimensionInteraction).filter(
-                    DimensionInteraction.description == group
-                ).first()
-                if interaction_dimension is None:
-                    interaction_dimension = DimensionInteraction(description=group)
-                    session.add(interaction_dimension)
-                    session.commit()
-                self._get_video().interation_group = interaction_dimension.id
-                break
+        interaction_dimension = self.get_interactions_group(interation)
+        if interaction_dimension:
+            self._get_video().interation_group_id = interaction_dimension.id
         return self
 
     def set_ratings_disabled(self, ratings_dis: bool):
@@ -113,6 +111,10 @@ class VideoBuilder:
 
     def set_comment_count(self, comment_count: int):
         self._get_video().comment_count = comment_count
+        return self
+
+    def set_interactions_points(self, interactions_points: int):
+        self._get_video().interactions_points = interactions_points
         return self
 
     def set_category(self, category_id: int):

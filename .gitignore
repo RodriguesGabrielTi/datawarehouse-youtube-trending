@@ -3,3 +3,5 @@
 /lib
 /bin
 /data
+.env
+__pycache__
