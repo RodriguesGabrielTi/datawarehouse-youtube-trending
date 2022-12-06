@@ -12,7 +12,7 @@ from utils.video_builder import VideoBuilder
 class DimensionCalc:
     def __init__(self):
         self._session = session
-        self._percentages = [0.1, 0.3, 0.6, 0.8, 1]
+        self._percentages = [0.021, 0.157, 0.843, 0.979, 1]
 
     def update_all_videos(self):
         videos = self._session.query(FactVideo).filter().all()
